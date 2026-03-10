@@ -15,6 +15,35 @@ export const getTimeTables = async (req: Request, res: Response) => {
   }
 };
 
+export const getSubjects = async (req: Request, res: Response) => {
+  try {
+    const timeTableId = parseInt(req.query.timeTableId as string);
+    if (isNaN(timeTableId)) {
+      return res.status(400).json({ error: "invalid timeTableId"})
+    }
+
+    const data = TimeTableService.getSubjects(timeTableId);
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: "Internal Server Error"})
+  }
+}
+
+
+export const getDocs = async (req: Request, res: Response) => {
+  try {
+    const subjectId = parseInt(req.query.subjectId as string);
+    if (isNaN(subjectId)) {
+      return res.status(400).json({ error: "invalid subjectId"})
+    }
+
+    const data = TimeTableService.getDocs(subjectId);
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: "Internal Server Error"})
+  }
+}
+
 export const registerUser = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;

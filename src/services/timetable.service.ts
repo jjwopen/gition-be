@@ -5,6 +5,16 @@ export const getUserTimeTables = (userId: number) => {
   return stmt.all(userId);
 };
 
+export const getSubjects = (timeTableId: number) => {
+  const stmt = db.prepare('SELECT id, name FROM Subject WHERE timeTableId = ?');
+  return stmt.all(timeTableId);
+}
+
+export const getDocs = (subjectId: number) => {
+  const stmt = db.prepare('SELECT id, title, body FROM Doc WHERE subjectId = ?');
+  return stmt.all(subjectId);
+}
+
 export const createUser = (email: string) => {
   try {
     const stmt = db.prepare(`
