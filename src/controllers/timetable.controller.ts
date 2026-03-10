@@ -32,7 +32,8 @@ export const registerUser = async (req: Request, res: Response) => {
 
 export const postTimeTable = async (req: Request, res: Response) => {
   try {
-    const { userId, name, timeTable, merge } = req.body;
+    console.log(req.body);
+    const { userId, name, timeTable, merge, subjectNames } = req.body;
 
     if (!userId || !name) {
       return res.status(400).json({ error: "userId와 name은 필수입니다." });
@@ -42,12 +43,46 @@ export const postTimeTable = async (req: Request, res: Response) => {
     const newTable = TimeTableService.createTimeTable(
         Number(userId),
         name,
-        timeTable || "",
-        merge || ""
+        JSON.stringify(timeTable) || "",
+        JSON.stringify(merge) || "",
+        subjectNames
     );
 
     res.status(201).json(newTable);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "서버 오류가 발생했습니다." });
   }
 };
+
+export const postDoc = async (req: Request, res: Response) => {
+  try {
+    const { subjectId, docTitle } = req.body;
+
+    if (!subjectId || !docTitle) {
+      return res.status(400).json({ error: "required: subjectId, docTitle"});
+    }
+
+    const newDoc = TimeTableService.createDoc(
+        Number(subjectId),
+        docTitle
+    );
+
+    res.status(201).json(newDoc);
+  } catch (e) {
+    res.status(500).json({error: "Server Error."});
+  }
+}
+
+export const updateDoc = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { title, body } = req.body;
+
+    const updatedDoc = TimeTableService.patchDoc(Number(id), title, body);
+
+    res.status(200).json(updatedDoc);
+  } catch (e) {
+    res.status(500).json({error: "Server Error."})
+  }
+}

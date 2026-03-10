@@ -1,8 +1,6 @@
 import db from '../lib/db.js';
 
-// 모든 시간표 정보 조회
 export const getUserTimeTables = (userId: number) => {
-  // id, name 외에 신규 필드도 포함하여 조회
   const stmt = db.prepare('SELECT id, name, timeTable, merge FROM TimeTable WHERE userId = ?');
   return stmt.all(userId);
 };
@@ -10,9 +8,9 @@ export const getUserTimeTables = (userId: number) => {
 export const createUser = (email: string) => {
   try {
     const stmt = db.prepare(`
-      INSERT INTO User (email)
-      VALUES (?)
-  `);
+        INSERT INTO User (email)
+        VALUES (?)
+    `);
 
     const info = stmt.run(email);
     return {
@@ -27,18 +25,63 @@ export const createUser = (email: string) => {
   }
 }
 
-// 시간표 생성 (POST)
-export const createTimeTable = (userId: number, name: string, timeTable: string = "", merge: string = "") => {
-  const stmt = db.prepare(`
-    INSERT INTO TimeTable (userId, name, timeTable, merge) 
-    VALUES (?, ?, ?, ?)
-  `);
+export const createTimeTable = (userId: number, tableName: string, timeTable: string = "", merge: string = "", subjectNames: string[]) => {
+  const execute = db.transaction((uId: number, n: string, tt: string, mg: string, sNames: string[]) => {
+    const tableStmt = db.prepare(`
+        INSERT INTO TimeTable (userId, name, timeTable, merge)
+        VALUES (?, ?, ?, ?)
+    `);
+    const tableInfo = tableStmt.run(uId, n, tt, mg);
+    const tableId = tableInfo.lastInsertRowid;
 
-  const info = stmt.run(userId, name, timeTable, merge);
+    const subjectStmt = db.prepare(`
+        INSERT INTO Subject (name, timeTableId)
+        VALUES (?, ?)
+    `);
+
+    for (const sName of sNames) {
+      subjectStmt.run(sName, tableId);
+    }
+
+    return tableId;
+  });
+
+  const newTableId = execute(userId, tableName, timeTable, merge, subjectNames);
+
   return {
-    id: info.lastInsertRowid,
-    name,
-    timeTable,
-    merge
+    id: Number(newTableId),
+    userId,
+    name: tableName,
+    subjectNames
   };
 };
+
+export const createDoc = (subjectId: number, docTitle: string) => {
+  const stmt = db.prepare(`
+  INSERT INTO Subject (title, body, subjectId)
+    VALUES (?, ?, ?)
+  `);
+
+  const info = stmt.run(docTitle, "", subjectId);
+  return {
+    id: Number(info.lastInsertRowid),
+    docTitle
+  }
+}
+
+export const patchDoc = (id: number, title?: string, body?: string) => {
+  const stmt = db.prepare(`
+      UPDATE Doc
+      SET title = COALESCE(?, title),
+          body  = COALESCE(?, body)
+      WHERE id = ?
+  `);
+
+  const info = stmt.run(title ?? null, body ?? null, id);
+
+  if ( info.changes === 0 ) {
+    throw new Error("Cannot find doc");
+  }
+
+  return db.prepare('SELECT * FROM Doc WHERE id = ?').get(id);
+}

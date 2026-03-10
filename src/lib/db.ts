@@ -26,8 +26,8 @@ db.exec(`
     (
         id       INTEGER PRIMARY KEY AUTOINCREMENT,
         name     TEXT    NOT NULL,
-        folderId INTEGER NOT NULL,
-        FOREIGN KEY (folderId) REFERENCES TimeTable (id) ON DELETE CASCADE
+        timeTableId INTEGER NOT NULL,
+        FOREIGN KEY (timeTableId) REFERENCES TimeTable (id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS Doc
@@ -35,8 +35,8 @@ db.exec(`
         id          INTEGER PRIMARY KEY AUTOINCREMENT,
         title       TEXT    NOT NULL,
         body        TEXT,
-        subFolderId INTEGER NOT NULL,
-        FOREIGN KEY (subFolderId) REFERENCES Subject (id) ON DELETE CASCADE
+        subjectId INTEGER NOT NULL,
+        FOREIGN KEY (subjectId) REFERENCES Subject (id) ON DELETE CASCADE
     );
 `);
 
