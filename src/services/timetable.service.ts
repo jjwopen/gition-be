@@ -68,7 +68,7 @@ export const createTimeTable = (userId: number, tableName: string, timeTable: st
 
 export const createDoc = (subjectId: number, docTitle: string) => {
   const stmt = db.prepare(`
-  INSERT INTO Subject (title, body, subjectId)
+  INSERT INTO Doc (title, body, subjectId)
     VALUES (?, ?, ?)
   `);
 
@@ -79,15 +79,10 @@ export const createDoc = (subjectId: number, docTitle: string) => {
   }
 }
 
-export const patchDoc = (id: number, title?: string, body?: string) => {
-  const stmt = db.prepare(`
-      UPDATE Doc
-      SET title = COALESCE(?, title),
-          body  = COALESCE(?, body)
-      WHERE id = ?
-  `);
+export const patchDoc = (id: number, body?: string) => {
+  const stmt = db.prepare(` UPDATE Doc SET body  = ? WHERE id = ? `);
 
-  const info = stmt.run(title ?? null, body ?? null, id);
+  const info = stmt.run(body, id);
 
   if ( info.changes === 0 ) {
     throw new Error("Cannot find doc");

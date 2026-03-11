@@ -29,7 +29,6 @@ export const getSubjects = async (req: Request, res: Response) => {
   }
 }
 
-
 export const getDocs = async (req: Request, res: Response) => {
   try {
     const subjectId = parseInt(req.query.subjectId as string);
@@ -105,12 +104,12 @@ export const postDoc = async (req: Request, res: Response) => {
 
 export const updateDoc = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const { title, body } = req.body;
+    const { docId, body } = req.body;
 
-    const updatedDoc = TimeTableService.patchDoc(Number(id), title, body);
+    const updatedDoc = TimeTableService.patchDoc(docId, body);
 
     res.status(200).json(updatedDoc);
+
   } catch (e) {
     res.status(500).json({error: "Server Error."})
   }

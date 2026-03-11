@@ -15,6 +15,6 @@ router.get('/doc/get/', getDocs);
 router.post('/user/post', registerUser);
 router.post('/timetable/post', postTimeTable);
 router.post('/doc/post', postDoc);
-router.post('/doc/update', updateDoc);
+router.patch('/doc/update', updateDoc);
 
 export default router;
