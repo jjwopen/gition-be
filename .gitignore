@@ -4,3 +4,5 @@ local.db
 node_modules
 .idea
 gition-be.iml
+.DS_Store
+*/.DS_Store
