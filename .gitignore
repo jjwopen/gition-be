@@ -1,3 +1,6 @@
 .env
 /src/generated/prisma
 local.db
+node_modules
+.idea
+gition-be.iml
